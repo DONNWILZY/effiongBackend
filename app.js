@@ -3,11 +3,14 @@ const cors = require('cors');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const dotenv =  require("dotenv");
 
 
 const app = express();
 
 // Middleware
+/// Call .env function
+dotenv.config()
 app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -25,7 +28,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/myapp', {
 /*
 // Routes
 app.use('/api/users', require('./routes/users'));
-app.use('/api/posts', require('./routes/posts'));
+app.use('/api/posts', require('./routes/posts')); 
+git remote remove origin
+git remote add origin https://github.com/DONNWILZY/effiongBackend
+
+
 */
 
 // Start server
