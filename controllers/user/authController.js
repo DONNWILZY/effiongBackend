@@ -1,14 +1,8 @@
-const User = require("../models/User.js");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken")
-/// EROOR TRACKERE
-const createError = require("../errormgt/error.js")
+import User from "../models/User.js";
+import bcrypt from "bcryptjs"
+import { createError } from "../errormgt/error.js";
+import jwt from "jsonwebtoken";
 
-
-
-
-
-/*
 
 ////////// REGISTER AUTH
 export const register = async(req, res, next)=>{
@@ -16,10 +10,10 @@ export const register = async(req, res, next)=>{
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(req.body.password)
         const newUser = new User({
-           //...req.body,
-          username: req.body.username,
-          email: req.body.email,
-          password: hash,
+           ...req.body,
+           // username: req.body.username,
+           // email: req.body.email,
+            password: hash
         });
 
     await newUser.save();
@@ -66,11 +60,9 @@ export const login = async (req, res, next)=>{
         res.cookie("access_token", token, {
 
         }).status(200).json({...otherDetails})
-       
+        */
     
     }catch(err){
         next(err); 
     }
 }
-
-*/
