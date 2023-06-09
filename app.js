@@ -3,10 +3,15 @@ const cors = require('cors');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const dotenv =  require("dotenv");
-
-
+const dotenv = require('dotenv');
 const app = express();
+const bcrypt = require('bcrypt');
+
+// Import routes
+const authRoute = require('./routes/auth.js');
+
+// Call dotenv function
+dotenv.config();
 
 // Middleware
 app.use(cors());
@@ -15,22 +20,27 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/myapp', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  //useCreateIndex: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.log(err));
+mongoose
+  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/myapp', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.log(err));
+
+app.get('/', (req, res) => {
+  res.send(`ACTIVELY ACTIVE ON PORT ${PORT}`);
+  console.log(`ACTIVELY ACTIVE ON PORT ${PORT}`);
+});
+
+// Routes middlewares
+app.use('/api/auth', authRoute);
+app.use('/api/users', require('./routes/users'));
+app.use('/api/posts', require('./routes/posts'));
 
 /*
-// Routes
-app.use('/api/users', require('./routes/users'));
-app.use('/api/posts', require('./routes/posts')); 
 git remote remove origin
 git remote add origin https://github.com/DONNWILZY/effiongBackend
-
-
 */
 
 // Start server

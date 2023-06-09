@@ -1,24 +1,17 @@
-import express from "express";
-const router = express.Router()
-import { login, register } from "../controllers/authController.js";
-import bcrypt from "bcryptjs"
+const express = require('express');
+const router = express.Router();
+const { login, register } = require('../controllers/user/authControllers');
+const bcrypt = require('bcrypt');
 
-////// REGISTER
-router.post("/register", register)
+// Register
+router.post('/register', register);
 
-///////SIGNIN
-router.post("/login", login);
+// Login
+router.post('/login', login);
 
-//////// VERIFICATION
-router.get("/token", (req, res)=>{
-    
-})
+// Verification
+router.get('/token', (req, res) => {
+  // TODO: Implement token verification logic
+});
 
-
-
-
-
-
-
-
-export default router
+module.exports = router;

@@ -1,70 +1,76 @@
-const User = require("../models/User.js");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken")
-/// EROOR TRACKERE
-const createError = require("../errormgt/error.js")
+const router = require('express').Router();
+const User = require('../../models/User.js');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const createError = require("../../utility/createError.js");
+const {verifyToken, verifyUser, verifyAdmin, erifyVendor} = require("../../utility/verifytoken.js")
 
+// Register
+router.post('/register', async (req, res) => {
+  try {
+    const { username, email, phone, password } = req.body;
 
-
-////////// REGISTER AUTH
-export const register = async(req, res, next)=>{
-    try{
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(req.body.password)
-        const newUser = new User({
-           //...req.body,
-          username: req.body.username,
-          email: req.body.email,
-          password: hash,
-        });
-
-    await newUser.save();
-    res.json({
-        status: 200,
-        message: "User has been created successfully",
-        data: newUser
-    })
-    }catch(err){
-        next(err)
+    // Check if the username or email already exists
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Username or email already exists' });
     }
 
-}
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-/////////LOGIN
-export const login = async (req, res, next)=>{
+    // Create a new user
+    const newUser = new User({
+      username,
+      email,
+      phone,
+      password: hashedPassword,
+    });
 
-    try{
-        const user = await User.findOne({username: req.body.username}) 
-       // const userEmail = await User.findOne({email: req.body.email}) 
-        if (!user) 
-             return next(createError(404, "USER NOT FOUND!"))
+    // Save the user to the database
+    const savedUser = await newUser.save();
 
-        const IsPasswordCoorect = await bcrypt.compare(req.body.password, user.password)
-        if (!IsPasswordCoorect)
-            return next(createError(400, "wrong Password"))
+    // Send a success response
+    res.status(201).json(savedUser);
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
-            /////if password is correct create new web token
-            const token = jwt.sign({id:user._id, isAdmin:user.isAdmin}, process.env.JWT_TOKEN)
+// Login
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-            ////////// KEEP PASSWORD & ADMIN STATUS FROM DATABASE, WHIE SHOWING OTHER DETAILS
-            const {password, isAdmin, ...otherDetails} = user._doc
+    // Find the user by username
+    const user = await User.findOne({ username });
 
-           res.cookie("access_token", token, {
-            ////// restricting client request to acces the cooke
-            httpOnly:true
-           }).json({
-            status: 200,
-            message: "succesfully loggin",
-            data: {deatils: {...otherDetails}}
-           })
-           
-            /*
-        res.cookie("access_token", token, {
-
-        }).status(200).json({...otherDetails})
-       
-    
-    }catch(err){
-        next(err); 
+    // Check if the user exists
+    if (!user) {
+      return res.status(401).json({ message: 'Wrong credentials' });
     }
-}
+
+    // Compare the passwords
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Wrong password' });
+    }
+
+    // Generate an access token
+    const accessToken = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      process.env.JWT_SEC,
+      { expiresIn: '3d' }
+    );
+
+    // Remove the password from the user object
+    const { password: _, ...userWithoutPassword } = user._doc;
+
+    // Send the response with the user and access token
+    res.status(200).json({ user: userWithoutPassword, accessToken });
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+module.exports = router;

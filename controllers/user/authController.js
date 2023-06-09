@@ -56,11 +56,11 @@ export const login = async (req, res, next)=>{
             data: {deatils: {...otherDetails}}
            })
            
-            /*
+            
         res.cookie("access_token", token, {
 
         }).status(200).json({...otherDetails})
-        */
+        
     
     }catch(err){
         next(err); 
