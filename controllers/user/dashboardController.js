@@ -1,7 +1,7 @@
 import Dashboard from "../models/Dashboard.js";
 
 /////CREATE HOTEL
-export const createDashBoard = async (req, res, next) =>{
+const createDashBoard = async (req, res, next) =>{
     const Addinfo = new Dashboard(req.body)
 
     try{
@@ -18,7 +18,7 @@ export const createDashBoard = async (req, res, next) =>{
 }
 
 ////// UPDATE HOTEL
-export const updateHotel = async (req, res, next) =>{
+const updateHotel = async (req, res, next) =>{
     try{
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id,

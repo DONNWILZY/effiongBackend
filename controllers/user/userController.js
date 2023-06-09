@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import dashboard from "../models/Dashboard.js";
 
 /////CREATE USER
-export const createUser = async (req, res, next) =>{
+const createUser = async (req, res, next) =>{
     const newUser = new User(req.body)
 
     try{
@@ -21,7 +21,7 @@ export const createUser = async (req, res, next) =>{
 }
 
 ////// UPDATE USER
-export const updateUser = async (req, res, next) =>{
+const updateUser = async (req, res, next) =>{
     try{
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
@@ -40,7 +40,7 @@ export const updateUser = async (req, res, next) =>{
 }
 
 /////DELETE USER
-export const deleteUser = async (req, res, next) =>{
+const deleteUser = async (req, res, next) =>{
     try{
         await User.findByIdAndDelete(req.params.id);
         res.json({
@@ -55,7 +55,7 @@ export const deleteUser = async (req, res, next) =>{
 
 
 /////// GET HOTEL BY ID
-export const getUser = async (req, res, next) =>{
+const getUser = async (req, res, next) =>{
     try{
         const user = await User.findById(req.params.id);
         res.json({
@@ -70,7 +70,7 @@ export const getUser = async (req, res, next) =>{
 }
 
 /////GET ALL USER
-export const getAllUsers = async (req, res, next) =>{
+const getAllUsers = async (req, res, next) =>{
     try{
         const users = await User.find();
         res.json({
@@ -82,3 +82,11 @@ export const getAllUsers = async (req, res, next) =>{
         next(err);
     }
 }
+
+module.exports = {
+    createUser,
+    updateUser,
+    deleteUser,
+    getUser,
+    getAllUsers,
+};

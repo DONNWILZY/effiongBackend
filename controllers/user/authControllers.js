@@ -1,9 +1,37 @@
-const router = require('express').Router();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*const router = require('express').Router();
 const User = require('../../models/User.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const createError = require("../../utility/createError.js");
-const {verifyToken, verifyUser, verifyAdmin, erifyVendor} = require("../../utility/verifytoken.js")
+const { verifyToken, verifyUser, verifyAdmin, verifyVendor } = require("../../utility/verifytoken.js");
+
 
 // Register
 router.post('/register', async (req, res) => {
@@ -74,3 +102,8 @@ router.post('/login', async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+
+*/
