@@ -8,7 +8,7 @@ const app = express();
 const bcrypt = require('bcrypt');
 
 // Import routes
-const authRoute = require('./routes/auth.js');
+const authRoute = require('./routes/auth');
 
 // Call dotenv function
 dotenv.config();
@@ -35,8 +35,8 @@ app.get('/', (req, res) => {
 
 // Routes middlewares
 app.use('/api/auth', authRoute);
-app.use('/api/users', require('./routes/users'));
-app.use('/api/posts', require('./routes/posts'));
+//app.use('/api/users', require('./routes/users'));
+//app.use('/api/posts', require('./routes/posts'));
 
 /*
 git remote remove origin

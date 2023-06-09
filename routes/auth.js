@@ -1,17 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const { login, register } = require('../controllers/user/authControllers');
-const bcrypt = require('bcrypt');
+// auth.js
+const router = require('express').Router();
+const authController = require('../controllers/user/authControllers');
+const { verifyToken } = require('../utility/verifyToken');
 
-// Register
-router.post('/register', register);
-
-// Login
-router.post('/login', login);
-
-// Verification
-router.get('/token', (req, res) => {
-  // TODO: Implement token verification logic
-});
+router.post('/register', authController.register);
+router.post('/login', authController.login);
 
 module.exports = router;
