@@ -2,46 +2,29 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      required: true
-    },
-    lastName: {
-      type: String,
-      required: true
-    },
-    username: {
+    siteName: {
       type: String,
       required: true,
       unique: true
     },
-    email: {
+    desc: {
+      type: String,
+      required: true
+    },
+    logo: {
       type: String,
       required: true,
       unique: true
     },
-    phone: {
+    image: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    waterark: {
       type: String,
       unique: true
     },
-    country: {
-      type: String
-    },
-    city: {
-      type: String
-    },
-    password: {
-      type: String,
-      required: true
-    },
-    isAdmin: {
-      type: Boolean,
-      default: false
-    },
-    isVip: {
-      type: Boolean,
-      default: false
-    }
   },
   {
     timestamps: true

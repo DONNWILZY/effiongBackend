@@ -43,7 +43,7 @@ const verifyVendor = (req, res, next) => {
     if (req.user.isVendor) {
       next();
     } else {
-      return next(createError(401, 'You are not a hotel owner'));
+      return next(createError(401, 'You are not a verified vendor'));
     }
   });
 };

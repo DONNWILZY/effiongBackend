@@ -10,18 +10,21 @@ const bcrypt = require('bcrypt');
 // Import routes
 const authRoute = require('./routes/auth');
 
+
 // Call dotenv function
 dotenv.config();
 
 // Middleware
 app.use(cors());
 app.use(morgan('dev'));
+// Parse JSON bodies
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
+// Parse URL-encoded form bodies
+app.use(bodyParser.urlencoded({ extended: true }));
 // Database connection
 mongoose
-  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/myapp', {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
