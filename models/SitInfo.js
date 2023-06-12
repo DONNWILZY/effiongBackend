@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema(
+const SiteInfoSchema = new mongoose.Schema(
   {
     siteName: {
       type: String,
@@ -31,6 +31,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const User = mongoose.model('User', userSchema);
+const SiteInfo = mongoose.model('SiteInfo', SiteInfoSchema);
 
-module.exports = User;
+module.exports = SiteInfo;

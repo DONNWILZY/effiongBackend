@@ -1,4 +1,4 @@
-const SiteInfo = require("../../models/SitInfo");
+const SiteInfo = require("../../models/SitInfo.js");
 //const createError = require('../../utility/createError');
 
 /////CREATE SITE INFO
@@ -19,7 +19,7 @@ const createSiteInfo = async (req, res, next) =>{
 }
 
 ////// UPDATE SITE INFO
-export const updateSiteInfo = async (req, res, next) =>{
+const updateSiteInfo = async (req, res, next) =>{
     try{
         const updatedSiteInfo = await SiteInfo.findByIdAndUpdate(
             req.params.id,
