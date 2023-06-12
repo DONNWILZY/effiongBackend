@@ -9,6 +9,6 @@ router.post('/', (req, res)=>{
 });
 router.post('/create', verifyAdmin, siteSteeings.createSiteInfo);
 router.post('/update', verifyAdmin, siteSteeings.updateSiteInfo);
-router.post('/update', verifyAdmin,  siteSteeings.AllSiteInfo);
+router.post('/view', verifyAdmin,  siteSteeings.AllSiteInfo);
 
 module.exports = router;

@@ -10,6 +10,8 @@ const bcrypt = require('bcrypt');
 // Import routes
 const authRoute = require('./routes/auth');
 const siteInfoRoute = require('./routes/siteInfo');
+const blogRoute = require('./routes/blog');
+
 
 
 // Call dotenv function
@@ -40,6 +42,8 @@ app.get('/', (req, res) => {
 // Routes middlewares
 app.use('/api/auth', authRoute);
 app.use('/api/siteInfo', siteInfoRoute);
+app.use('/api/blog', blogRoute);
+
 //app.use('/api/users', require('./routes/users'));
 //app.use('/api/posts', require('./routes/posts'));
 
