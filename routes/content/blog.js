@@ -1,13 +1,13 @@
 // auth.js
 const router = require('express').Router();
-const blog = require('../controllers/content/blog');
-const { verifyToken, verifyAdmin } = require('../utility/verifytoken');
+const blog = require('../../controllers/content/blog');
+const { verifyToken, verifyAdmin } = require('../../utility/verifytoken');
 
 
-router.post('/', (req, res)=>{
+router.get('/', (req, res)=>{
     res.send(" blog posts")
 });
-router.post('/create', verifyAdmin, blog.createBlogpost);
+router.post('/create',  blog.createBlogpost);
 router.put('/update', verifyAdmin, blog.updateBlogPost);
 router.delete('/delete', verifyAdmin,  blog.deleteBlogPost);
 router.get('/view', blog.getBlogPost);

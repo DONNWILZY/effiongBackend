@@ -8,9 +8,9 @@ const app = express();
 const bcrypt = require('bcrypt');
 
 // Import routes
-const authRoute = require('./routes/auth');
-const siteInfoRoute = require('./routes/siteInfo');
-const blogRoute = require('./routes/blog');
+const authRoute = require('./routes/auth/auth');
+const siteInfoRoute = require('./routes/settings/siteInfo');
+const blogRoute = require('./routes/content/blog.js');
 
 
 
@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 
 // Parse URL-encoded form bodies
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json())
 // Database connection
 mongoose
   .connect(process.env.MONGODB_URI, {

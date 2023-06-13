@@ -10,7 +10,7 @@ const createSiteInfo = async (req, res, next) =>{
         res.json({
             status: 200,
             message: "successfully Created SITE INFO",
-            data: savedinfo
+            data: savedSiteinfo
         });
 
     }catch(err){
@@ -58,5 +58,4 @@ module.exports = {
     createSiteInfo,
     updateSiteInfo,
     AllSiteInfo,
-
   };

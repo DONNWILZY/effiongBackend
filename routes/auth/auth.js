@@ -1,7 +1,7 @@
 // auth.js
 const router = require('express').Router();
-const authController = require('../controllers/user/authControllers');
-const { verifyToken } = require('../utility/verifyToken');
+const authController = require('../../controllers/user/authControllers');
+const { verifyToken, verifyAdmin, verifyUser, verifyVendor } = require('../../utility/verifyToken');
 
 
 router.post('/', (req, res)=>{
