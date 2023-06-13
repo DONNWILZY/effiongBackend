@@ -1,4 +1,4 @@
-const SiteInfo = require("../../models/SitInfo.js");
+const SiteInfo = require("../../models/settings/SitInfo.js");
 //const createError = require('../../utility/createError');
 
 /////CREATE SITE INFO

@@ -2,7 +2,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const createError = require('../../utility/createError.js');
-const User = require('../../models/user');
+const User = require('../../models/user/User');
 
 const register = async (req, res, next) => {
   try {

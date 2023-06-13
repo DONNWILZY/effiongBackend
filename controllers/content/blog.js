@@ -1,5 +1,5 @@
 const createError = require('../../utility/createError');
-const Blog = require('../../models/Blog');
+const Blog = require('../../models/content/Blog');
 
 /////CREATE BLOG POST
 const createBlogpost = async (req, res, next) =>{
