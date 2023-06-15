@@ -1,92 +1,104 @@
-//import Hotel from "../models/User.js";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
-import dashboard from "../models/Dashboard.js";
+const moment = require('moment');
+const createError = require ('../../utility/createError.js');
+const User = require ('../../models/user/User.js');
+const mongoose = require('mongoose');
 
-/////CREATE USER
-const createUser = async (req, res, next) =>{
-    const newUser = new User(req.body)
+const createUser = async (req, res, next) => {
+  const newUser = new User(req.body);
 
-    try{
-        const savedUser = await newUser.save();
-        res.json({
-            status: 200,
-            message: "successfully Created New Hotel",
-            data: savedUser
-        });
+  try {
+    const savedUser = await newUser.save();
+    res.json({
+      status: 200,
+      message: "Successfully created a new user",
+      data: savedUser
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    }catch(err){
-        next(err);
-    }
-}
+const updateUser = async (req, res, next) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+    res.json({
+      status: 200,
+      message: `User with ID ${req.params.id} updated`,
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-////// UPDATE USER
-const updateUser = async (req, res, next) =>{
-    try{
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            { $set: req.body },
-            { new: true }
-          );
-          res.json({
-            status: 200,
-            message: `User with ID ${req.params.id} updated`,
-            data: updatedUser,
-          });
-        //catch blog for update
-    }catch(err){
-        next(err);
-    }
-}
+const deleteUser = async (req, res, next) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({
+      status: 200,
+      message: `User with ID ${req.params.id} deleted successfully`
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-/////DELETE USER
-const deleteUser = async (req, res, next) =>{
-    try{
-        await User.findByIdAndDelete(req.params.id);
-        res.json({
-            status: 200,
-            message: `Hotel with ID:  ${req.params.id} deleted succesfully`
-        })
-        //catch blog for delete
-    }catch(err){
-        next(err);
-    }
-}
+const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json({
+      status: 200,
+      message: `User with ID ${req.params.id} found`,
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.json({
+      status: 200,
+      message: users
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-/////// GET HOTEL BY ID
-const getUser = async (req, res, next) =>{
-    try{
-        const user = await User.findById(req.params.id);
-        res.json({
-            status: 200,
-            message: `User with this ID(s) ${req.params.id} found`,
-            data: user
-        })
+const getActiveUsers = async (req, res, next) => {
+  try {
+    const activeUsers = await User.find({ activity: 'active' }).sort({ updatedAt: -1 });
 
-    }catch(err){
-        next(err);
-    }
-}
+    const formattedUsers = activeUsers.map(user => {
+      const activityTime = moment(user.updatedAt).fromNow();
+      return {
+        ...user.toObject(),
+        activityTime
+      };
+    });
 
-/////GET ALL USER
-const getAllUsers = async (req, res, next) =>{
-    try{
-        const users = await User.find();
-        res.json({
-            status: 200,
-            message: users
-        })
+    res.json({
+      status: 200,
+      message: 'Active users sorted by moment',
+      data: formattedUsers
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    }catch(err){
-        next(err);
-    }
-}
-
-module.exports = {
-    createUser,
-    updateUser,
-    deleteUser,
-    getUser,
-    getAllUsers,
+export {
+  createUser,
+  updateUser,
+  deleteUser,
+  getUser,
+  getAllUsers,
+  getActiveUsers
 };

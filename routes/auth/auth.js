@@ -7,7 +7,7 @@ const { verifyToken, verifyAdmin, verifyUser, verifyVendor } = require('../../ut
 router.post('/', (req, res)=>{
     res.send(" auth us working")
 });
-router.post('/register', authController.register);
+router.post('/register', authController.register.register);
 router.post('/login', authController.login);
 
 module.exports = router;
