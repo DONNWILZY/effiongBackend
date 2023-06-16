@@ -19,6 +19,6 @@ router.get('/verified', (req, res)=>{
     res.sendFile(path.join(__dirname, './../views/verified.html'));
   })
 
-
+  router.get("/token", VerificationToken)
 
 module.exports = router;

@@ -29,6 +29,7 @@ const emailUsers = async (req, res, next) => {
         };
 
         // Send email
+        //if (User.isAdmin)
         mailer.sendMail(mailOptions, (error, info) => {
           if (error) {
             reject(error);

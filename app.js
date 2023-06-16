@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const app = express();
 const bcrypt = require('bcrypt');
+const cookieParser = require ('cookie-parser');
 
 // Import routes
 const authRoute = require('./routes/auth/auth');
