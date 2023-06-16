@@ -2,7 +2,8 @@ const express = require ("express");
 const router = express.Router();
 const jwt = require ("jsonwebtoken");
 const authControllers = require('../../controllers/user/birtthdayController.js');
-const birthdayController = require('../../controllers/user/birtthdayController')
+const birthdayController = require('../../controllers/user/birtthdayController.js')
+const emailAllUsers = require('../../controllers/user/emailUsersController.js');
 
 ///// IMPORT CONTROLLERS FROM userController.js
 const { 
@@ -35,5 +36,9 @@ router.get('/active', getActiveUsers);
 
 //update Birthday
 router.patch('/:userId/birthday', birthdayController.updateBirthday);
+
+//send email to all users
+router.post('/email', emailAllUsers.emailUsers);
+//router.post('/email', emailUsersController );
 
 module.exports = router;
