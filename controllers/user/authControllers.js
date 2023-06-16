@@ -100,13 +100,24 @@ const register = {
     const { username, email, password } = req.body;
 
     try {
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+      
+      //const vvv = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({
           status: 'failed',
-          message: 'Email is already registered.',
+          message: 'Email or User is already registered.',
         });
       }
+
+       // Password requirements
+    const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, and a special character.',
+      });
+    }
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
@@ -203,9 +214,59 @@ const verifyEmail = async (req, res) => {
   
 
   
+  const login = async (req, res, next) => {
+    try {
+      const { email, username, password } = req.body;
+  
+      if (!username && !email) {
+        return res.status(400).json({
+          status: 'failed',
+          message: 'Username or email field is required',
+        });
+      }
+  
+      const user = await User.findOne({ $or: [{ username }, { email }] });
+      if (!user) {
+        return res.status(500).json({
+          status: 'failed',
+          message: 'Wrong username or email',
+        });
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(500).json({
+          status: 'failed',
+          message: 'Wrong password',
+        });
+      }
+  
+      if (!user.verified) {
+        return res.status(400).json({
+          status: 'failed',
+          message: 'Please verify your email before signing in',
+        });
+      }
+  
+      const token = jwt.sign({ userId: user._id }, process.env.PASS_SEC, { expiresIn: '1h' });
+      const { isAdmin, ...otherDetails } = user._doc;
+  
+      return res.status(200).json({
+        status: 'success',
+        message: 'Successfully signed in',
+        token,
+        user: otherDetails,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'failed',
+        message: 'Internal server error',
+      });
+    }
+  };
   
 
-  
+  /*
   const login = async (req, res, next) => {
     try {
       const { email, username, password } = req.body;
@@ -227,6 +288,7 @@ const verifyEmail = async (req, res) => {
       }
   
       const token = jwt.sign({ userId: user._id }, process.env.PASS_SEC, { expiresIn: '1h' });
+      //const {password, isAdmin, ...otherDetails} = user._doc
   
       res.status(200).json({ token });
     } catch (error) {
@@ -236,7 +298,9 @@ const verifyEmail = async (req, res) => {
       });
     }
   };
-  
+  */
+
+
   const authController = {
     // Other controller methods
     register, 
