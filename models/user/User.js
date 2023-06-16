@@ -41,15 +41,27 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    
     isVip: {
       type: Boolean,
       default: false,
     },
+
+    lastLogin : {
+      type: String
+    },
+
     activity: {
       type: String,
       enum: ["active", "inactive"],
       default: "inactive",
     },
+    onlineStatus: {
+      type: String,
+      enum: ["online", "offline"],
+      default: "offline",
+    },
+   
   },
   { timestamps: true }
 );

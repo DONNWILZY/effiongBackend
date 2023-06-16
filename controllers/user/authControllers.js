@@ -101,7 +101,7 @@ const register = {
 
     try {
       const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-      
+
       //const vvv = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({
@@ -247,9 +247,20 @@ const verifyEmail = async (req, res) => {
           message: 'Please verify your email before signing in',
         });
       }
-  
+      
+      user.lastLogin = new Date();
+    user.activity = 'active';
+    await user.save();
+
+    user.activeStatus = new Date();
+    user.onlineStatus = 'online';
+    await user.save();
+      
+
       const token = jwt.sign({ userId: user._id }, process.env.PASS_SEC, { expiresIn: '1h' });
       const { isAdmin, ...otherDetails } = user._doc;
+
+      
   
       return res.status(200).json({
         status: 'success',
@@ -266,39 +277,45 @@ const verifyEmail = async (req, res) => {
   };
   
 
-  /*
-  const login = async (req, res, next) => {
-    try {
-      const { email, username, password } = req.body;
-  
-      const user = await User.findOne({ $or: [{ username }, { email }] });
-      if (!user) {
-        return res.status(500).json({
-          status: 'failed',
-          message: 'Wrong username or email',
-        });
-      }
-  
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(500).json({
-          status: 'failed',
-          message: 'Wrong password',
-        });
-      }
-  
-      const token = jwt.sign({ userId: user._id }, process.env.PASS_SEC, { expiresIn: '1h' });
-      //const {password, isAdmin, ...otherDetails} = user._doc
-  
-      res.status(200).json({ token });
-    } catch (error) {
-      return res.status(500).json({
-        status: 'failed',
-        message: 'Internal server error',
-      });
-    }
-  };
-  */
+ // Helper function to get the last seen status
+const getLastSeenStatus = (lastLogin) => {
+  const currentTime = new Date();
+  const timeDiff = currentTime - lastLogin;
+
+  if (timeDiff < 60000) { // Less than 1 minute
+    return 'Just now';
+  } else if (timeDiff < 3600000) { // Less than 1 hour
+    const minutes = Math.floor(timeDiff / 60000);
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else if (timeDiff < 86400000) { // Less than 1 day
+    const hours = Math.floor(timeDiff / 3600000);
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else if (timeDiff < 2592000000) { // Less than 1 month
+    const days = Math.floor(timeDiff / 86400000);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  } else if (timeDiff < 31536000000) { // Less than 1 year
+    const months = Math.floor(timeDiff / 2592000000);
+    return `${months} month${months > 1 ? 's' : ''} ago`;
+  } else { // More than 1 year
+    const years = Math.floor(timeDiff / 31536000000);
+    return `${years} year${years > 1 ? 's' : ''} ago`;
+  }
+  res.status(200).json({
+    status: 'success',
+    message: getLastSeenStatus
+  })
+};
+
+
+
+
+
+
+
+
+
+
+
 
 
   const authController = {
