@@ -5,6 +5,7 @@ const createError = require('../../utility/createError');
 const User = require('../../models/user/User.js');
 const mailer = require('../../utility/mailer.js');
 const path = require('path');
+const VerificationToken = require('../../models/user/VerificationToken');
 const OtpCode = require('../../models/user/OtpCode');
 
 
@@ -21,7 +22,7 @@ const sendVerificationEmail = async (user) => {
     html: `
       <h1>Email Verification</h1>
       <p>Thank you for signing up. Please click the following link to verify your email:</p>
-      <a href="${currentUrl}/verify/email/${_id}/${uniqueString}">Verify Email</a>
+    <a href="${currentUrl}/api/auth/verifyEmail/${_id}/${uniqueString}">Verify Email</a> 
       <p>Alternatively, you can use the following verification code:</p>
       <p><strong>${verificationCode}</strong></p>
       <p>Please enter the verification code in your account settings to verify your email.</p>
@@ -37,7 +38,7 @@ const sendVerificationEmail = async (user) => {
       expiresAt: Date.now() + 21600000,
     });
     await newVerificationToken.save();
-    await mailer.transporter.sendMail(mailOptions);
+    await mailer.sendMail(mailOptions);
     console.log('Verification email sent');
   } catch (error) {
     console.log('Failed to send verification email');
@@ -65,8 +66,12 @@ const sendVerificationOTP = async (user) => {
     expiresAt: Date.now() + 600000, // 10 minutes
   });
 
+/*
+  
   try {
     await otpCodeRecord.save();
+    
+    
     const mailOptions = {
       from: process.env.AUTH_EMAIL,
       to: email,
@@ -84,7 +89,11 @@ const sendVerificationOTP = async (user) => {
     console.log('Failed to send verification OTP');
     console.log(error);
   }
+*/
+
 };
+
+
 
 const register = {
   register: async (req, res) => {
@@ -130,29 +139,115 @@ const register = {
   // Rest of the code...
 };
 
-const login = async (req, res, next) => {
+
+const verifyEmail = async (req, res) => {
+    // Extract the userId and verificationString from the request parameters
+    const { userId, verificationString } = req.params;
+  
     try {
-      const { username, password } = req.body;
+      const verificationToken = await VerificationToken.findOne({ userId });
   
-      const user = await User.findOne({ username });
-      if (!user) {
-        return next(createError(401, 'Invalid username or password'));
+      if (!verificationToken) {
+        // No verification token found for the user
+        return res.status(400).json({
+          status: 'failed',
+          message: 'Invalid verification link.',
+        });
       }
   
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return next(createError(401, 'Invalid username or password'));
+      // Check if the verification token has expired
+      if (verificationToken.expiresAt < Date.now()) {
+        // If the verification link has expired, delete the verification token and the user
+        await VerificationToken.deleteOne({ userId });
+        await User.deleteOne({ _id: userId });
+  
+        return res.status(400).json({
+          status: 'failed',
+          message: 'Verification link has expired. Please sign up again.',
+        });
       }
   
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      // Compare the verification string with the hashed token
+      const isMatch = await bcrypt.compare(verificationString, verificationToken.token);
   
-      res.status(200).json({ token });
+      if (!isMatch) {
+        // Incorrect verification details
+        return res.status(400).json({
+          status: 'failed',
+          message: 'Invalid verification link.',
+        });
+      }
+  
+      // Mark the user as verified
+      await User.updateOne({ _id: userId }, { verified: true });
+  
+      // Delete the verification token
+      await VerificationToken.deleteOne({ userId });
+     
+        
+      return res.status(200).json({
+        status: 'success',
+        message: 'Email verification successful.',
+        
+      });
+
+  
     } catch (error) {
-      next(createError(500, 'Internal server error'));
+      console.log(error);
+      return res.status(500).json({
+        status: 'failed',
+        message: 'An error occurred while verifying the email.',
+      });
     }
   };
   
 
+  
+  
+
+  
+  const login = async (req, res, next) => {
+    try {
+      const { email, username, password } = req.body;
+  
+      const user = await User.findOne({ $or: [{ username }, { email }] });
+      if (!user) {
+        return res.status(500).json({
+          status: 'failed',
+          message: 'Wrong username or email',
+        });
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(500).json({
+          status: 'failed',
+          message: 'Wrong password',
+        });
+      }
+  
+      const token = jwt.sign({ userId: user._id }, process.env.PASS_SEC, { expiresIn: '1h' });
+  
+      res.status(200).json({ token });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'failed',
+        message: 'Internal server error',
+      });
+    }
+  };
+  
+  const authController = {
+    // Other controller methods
+    register, 
+    login,
+    verifyEmail,
+  };
+
 module.exports = {
     register, 
-    login};
+    login,
+    verifyEmail};
+
+   
+
