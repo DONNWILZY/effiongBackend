@@ -94,7 +94,16 @@ const getActiveUsers = async (req, res, next) => {
   }
 };
 
-export {
+const userController = {
+  createUser,
+  updateUser,
+  deleteUser,
+  getUser,
+  getAllUsers,
+  getActiveUsers
+};
+
+module.exports = {
   createUser,
   updateUser,
   deleteUser,

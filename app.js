@@ -11,6 +11,7 @@ const bcrypt = require('bcrypt');
 const authRoute = require('./routes/auth/auth');
 const siteInfoRoute = require('./routes/settings/siteInfo');
 const blogRoute = require('./routes/content/blog.js');
+const userRoute = require('./routes/user/user');
 
 
 
@@ -44,6 +45,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoute);
 app.use('/api/siteInfo', siteInfoRoute);
 app.use('/api/blog', blogRoute);
+app.use('/api/user', userRoute);
 
 //app.use('/api/users', require('./routes/users'));
 //app.use('/api/posts', require('./routes/posts'));

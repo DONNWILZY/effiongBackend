@@ -1,6 +1,8 @@
 const express = require ("express");
 const router = express.Router();
 const jwt = require ("jsonwebtoken");
+const authControllers = require('../../controllers/user/birtthdayController.js');
+const birthdayController = require('../../controllers/user/birtthdayController')
 
 ///// IMPORT CONTROLLERS FROM userController.js
 const { 
@@ -31,4 +33,7 @@ router.get('/', getAllUsers);
 // Get active users sorted by moment
 router.get('/active', getActiveUsers);
 
-export default router;
+//update Birthday
+router.patch('/:userId/birthday', birthdayController.updateBirthday);
+
+module.exports = router;

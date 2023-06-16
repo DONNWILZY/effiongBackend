@@ -37,11 +37,16 @@ const userSchema = new mongoose.Schema(
       default: false
     },
 
+    birthday: {
+      type: Date
+     
+    },
+
     isAdmin: {
       type: Boolean,
       default: false,
     },
-    
+
     isVip: {
       type: Boolean,
       default: false,
