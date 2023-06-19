@@ -7,20 +7,41 @@ const { verifyToken, verifyAdmin } = require('../../utility/verifytoken');
 router.get('/', (req, res)=>{
     res.send(" blog posts")
 });
-router.post('/create',  blog.createBlogpost);
-router.put('/update', verifyAdmin, blog.updateBlogPost);
-router.delete('/delete', verifyAdmin,  blog.deleteBlogPost);
-router.get('/view', blog.getBlogPost);
+router.post('/create/:userId', verifyAdmin, blog.createBlogpost);
+router.put('/update/:id', verifyAdmin, blog.updateBlogPost);
+router.delete('/delete/:id', verifyAdmin,  blog.deleteBlogPost);
+router.get('/view', blog.getAllPosts);
+router.get('/viewpost', blog.getBlogPost); /// VIEW POST WITH ID
 
+
+///FEATURES
+router.get('/featured', blog.getFeaturedPosts)
 // recents
-router.get('/update')
+router.get('/recent', blog.getRecentPosts)
 // most viewed post
-router.get('/update')
+router.get('/mostViewed', blog.getMostViewedPost)
 //related
-router.get('/update')
+router.get('/related', blog.getRelatedPosts)
 //mostviewd catgory
-router.get('/update')
+router.get('/mostviewdcat', blog.getMostViewedCategory)
 //// stats for admin
-router.get('/stats', verifyAdmin)
+router.get('/stats', verifyAdmin, blog.getAdminStats)
 
 module.exports = router;
+
+
+/*
+ createBlogpost,
+  updateBlogPost,
+  deleteBlogPost,
+  getBlogPost,
+  getAllPosts,
+  getFeaturedPosts,
+  getRecentPosts,
+  getMostViewedPost,
+  getRelatedPosts,
+  getMostViewedCategory,
+  getAdminStats
+
+
+*/

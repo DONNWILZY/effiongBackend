@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 
 const BlogSchema = new mongoose.Schema(
   {
+///////////// ADDING AUTHOR FROM User model
+    username: {
+      type:  mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      //required: true
+    },
+
     title: {
       type: String,
       required: true,
@@ -13,6 +20,11 @@ const BlogSchema = new mongoose.Schema(
     photos: [{
       type: String,
     }],
+
+    featured: {
+      type: Boolean,
+      default: false,
+    },
 
     tags: [{
       type: String,
@@ -26,6 +38,20 @@ const BlogSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+
+///////////// SPECIFY FIELD AUTHOR FROM User model
+BlogSchema.virtual('userName', {
+  ref: 'User',
+  localField: ['username'],
+  foreignField: ['username'],
+  justOne: true
+});
+
+BlogSchema.set('toObject', { virtuals: true });
+BlogSchema.set('toJSON', { virtuals: true });
+
+
 
 const Blog = mongoose.model('Blog', BlogSchema);
 
