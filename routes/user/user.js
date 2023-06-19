@@ -5,6 +5,7 @@ const authControllers = require('../../controllers/user/birtthdayController.js')
 const birthdayController = require('../../controllers/user/birtthdayController.js')
 const emailAllUsers = require('../../controllers/user/emailUsersController.js');
 const PasswordReset = require('../../controllers/user/resetPassword.js')
+//const {} = require('../../')
 
 
 ///// IMPORT CONTROLLERS FROM userController.js
@@ -22,13 +23,13 @@ const {verifyToken,
 
 
 // Create a new user
-router.post('/', createUser);
+router.post('/create', verifyUser, verifyAdmin, createUser);
 
 // Update a user
-router.put('/:id', updateUser);
+router.put('/:id', verifyUser, verifyAdmin, updateUser);
 
 // Delete a user
-router.delete('/:id', deleteUser);
+router.delete('/:id', verifyUser, verifyAdmin, deleteUser);
 
 // Get a user by ID
 router.get('/:id', getUser);
@@ -38,6 +39,12 @@ router.get('/', getAllUsers);
 
 // Get active users sorted by moment
 router.get('/active', getActiveUsers);
+
+// Get Online users sorted by moment
+//router.get('/active', getActiveUsers);
+
+// Get Online users by last seen
+//router.get('/active', getActiveUsers);
 
 //update Birthday
 router.patch('/birthday/:userId/', birthdayController.updateBirthday);

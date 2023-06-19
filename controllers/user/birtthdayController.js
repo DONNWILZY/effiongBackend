@@ -43,10 +43,10 @@ const sendBirthdayEmails = async () => {
       try {
         const mailOptions = {
           from: process.env.AUTH_EMAIL,
-          to: req.body.email,
+          to: users.email,
           subject: 'Happy Birthday!',
           html: `
-            <p>Dear ${user.username},\n\nHappy birthday! Wishing you a fantastic day filled with joy and happiness.\n\nBest regards,\nYour Application</p>
+            <p>Dear ${users.username},\n\nHappy birthday! Wishing you a fantastic day filled with joy and happiness.\n\nBest regards,\nYour Application</p>
           `,
         };
 
@@ -58,6 +58,7 @@ const sendBirthdayEmails = async () => {
       }
     }
 
+    
     console.log('Birthday emails sent successfully.');
   } catch (error) {
     console.error('Error sending birthday emails:', error);
@@ -66,8 +67,7 @@ const sendBirthdayEmails = async () => {
 };
 
 // Schedule the task to run every day at a specific time (e.g., 8:00 AM)
-cron.schedule('28 22 * * *', sendBirthdayEmails);
-console.log('h')
+cron.schedule('03 04 * * *', sendBirthdayEmails);
 
 
 /*
