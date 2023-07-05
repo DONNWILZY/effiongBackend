@@ -7,94 +7,85 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const token = require('../../models/user/token.js')
 const verificationCode = require('../../models/user/ResetPasswordComfirmationCode.js')
+const currentUrl = 'http://127.0.0.1:8080';
 
-
-
-
-// POST /api/reset-password/request
-router.post('/request', async (req, res, next) => {
+// Request password reset
+const requestPasswordReset = async (req, res, next) => {
   try {
-    const { email } = req.body;
-
     // Generate a 6-digit verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const code = Math.floor(100000 + Math.random() * 900000);
 
-    // Create a verification code record in the database
-    await VerificationCode.findOneAndUpdate(
-      { email },
-      { code: verificationCode },
-      { upsert: true }
+    // Update user with the verification code
+    const user = await User.findOneAndUpdate(
+      { email: req.body.email },
+      { passwordResetCode: code },
+      { new: true }
     );
 
-    // Generate a token with the email and verification code
-    const token = jwt.sign({ email, verificationCode }, process.env.JWT_SECRET);
-
-    // Save the token in the database
-    await Token.create({ email, token });
-
-   
+    // Send the verification code to the user's email
     const mailOptions = {
-      from: 'your-email@example.com',
-      to: email,
-      subject: 'Password Reset',
-      text: `Please use the following verification code: ${verificationCode}`,
-      html: `Please use the following verification code: <strong>${verificationCode}</strong>.<br><br>Click <a href="${resetPasswordLink}">here</a> to reset your password.`,
+      from: process.env.AUTH_EMAIL,
+      to: user.email,
+      subject: 'Password Reset Verification',
+      html: `
+        <p>Dear ${user.username},</p>
+        <p>You have requested to reset your password. Please use the following verification code to proceed:</p>
+        <p><strong>${code}</strong></p>
+        <p>Alternatively, you can click on the following link to reset your password:</p>
+        <a href="${currentUrl}/api/user/confirmPassword/${code}"> Reset Password</a>
+        <p>If you did not initiate this request, please ignore this email.</p>
+      `,
     };
-    await mail.sendMail(mailOptions);
 
-    res.status(200).json({ message: 'Verification code sent successfully' });
+    mailer.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending password reset email:', error);
+        next(error);
+      } else {
+        console.log('Password reset email sent successfully');
+        res.status(200).json({ message: 'Password reset email sent successfully' });
+      }
+    });
   } catch (error) {
+    console.error('Error requesting password reset:', error);
     next(error);
   }
-});
+};
 
-// GET /api/reset-password/verify?token=<token>
-router.get('/verify', async (req, res, next) => {
+// Confirm password reset
+const confirmPasswordReset = async (req, res, next) => {
+  const { email, verificationCode, newPassword } = req.body;
+
   try {
-    const { token } = req.query;
+    // Find the user by email and check if the verification code is valid
+    const user = await User.findOne({
+      email,
+      passwordResetCode: code,
+      passwordResetExpiry: { $gt: Date.now() }, // Check if the code is not expired
+    });
 
-    // Verify and decode the token
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Check if the token exists in the database
-    const tokenRecord = await Token.findOne({ email: decodedToken.email, token });
-    if (!tokenRecord) {
-      throw createError(400, 'Invalid or expired token');
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid verification code' });
     }
 
-    // Render a form for the user to enter the new password
-    res.render('resetPasswordForm', { token });
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password and remove the verification code fields
+    user.password = hashedPassword;
+    user.passwordResetCode = undefined;
+    user.passwordResetExpiry = undefined;
+
+    await user.save();
+
+    res.json({ message: 'Password reset successfully' });
   } catch (error) {
+    console.error('Error confirming password reset:', error);
     next(error);
   }
-});
+};
 
-// POST /api/reset-password/reset
-router.post('/reset', async (req, res, next) => {
-  try {
-    const { token, password } = req.body;
-
-    // Verify and decode the token
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Check if the token exists in the database
-    const tokenRecord = await Token.findOne({ email: decodedToken.email, token });
-    if (!tokenRecord) {
-      throw createError(400, 'Invalid or expired token');
-    }
-
-    // Update the user's password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.findOneAndUpdate({ email: decodedToken.email }, { password: hashedPassword });
-
-    // Delete the token and verification code records
-    await Token.findOneAndDelete({ email: decodedToken.email, token });
-    await VerificationCode.findOneAndDelete({ email: decodedToken.email });
-
-    res.status(200).json({ message: 'Password reset successful' });
-  } catch (error) {
-    next(error);
-  }
-});
-
-module.exports = router;
+module.exports = {
+  requestPasswordReset,
+  confirmPasswordReset,
+};

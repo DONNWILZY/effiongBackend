@@ -54,6 +54,8 @@ router.post('/email/:userId', verifyAdmin, emailAllUsers.emailUsers);
 //router.post('/email', emailUsersController );
 
 //reset password
-router.post('/reset-password/request', verifyUser, PasswordReset);
+router.post('/resetPassword/',  PasswordReset.requestPasswordReset);
+//reset password
+router.post('/comfirmPassword', PasswordReset.confirmPasswordReset);
 
 module.exports = router;

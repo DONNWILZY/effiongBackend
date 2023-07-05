@@ -59,6 +59,14 @@ const userSchema = new mongoose.Schema(
       type: String
     },
 
+    verificationCode: {
+      type: String,
+    },
+    
+    passwordResetExpiry: {
+      type: Date,
+    },
+
     activity: {
       type: String,
       enum: ["active", "inactive"],
